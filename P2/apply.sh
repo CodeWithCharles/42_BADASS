@@ -59,16 +59,16 @@ fi
 for cid in $running; do
     hostname=$(docker exec "$cid" hostname)
 
-    # Extract the numeric ID from the GNS3 hostname suffix (e.g. "router_sucho-1" → "1")
+    # Extract the numeric ID from the GNS3 hostname suffix (e.g. "router-cpoulain-1" → "1")
     id="${hostname##*-}"
 
     case "$hostname" in
-        router_*-*)
+        router-*-*)
             # Generate config inline and pipe it into the container — avoids docker cp
             router_config "$id" | docker exec -i "$cid" sh
             echo "[$MODE] Router config applied to $cid ($hostname)"
             ;;
-        host_*-*)
+        host-*-*)
             host_config "$id" | docker exec -i "$cid" sh
             echo "Host config applied to $cid ($hostname)"
             ;;
