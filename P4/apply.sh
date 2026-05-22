@@ -230,7 +230,11 @@ exit
 router bgp $asn vrf tenant1
  neighbor $dci_peer remote-as $asn_remote
  address-family ipv4 unicast
+  redistribute connected
   neighbor $dci_peer activate
+ exit-address-family
+ address-family l2vpn evpn
+  advertise ipv4 unicast
  exit-address-family
 exit
 EOF
