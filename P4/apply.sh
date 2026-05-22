@@ -102,16 +102,16 @@ ip link set vxlan999 master br999
 ip link set br999 master tenant1
 ip link set vxlan999 up
 ip link set br999 up
-ip link add vxlan100 type vxlan id 10100 local $lo_ip dstport 4789 nolearning
+ip link add vxlan100 type vxlan id 10${dc}00 local $lo_ip dstport 4789 nolearning
 ip link add br100 type bridge
 ip link set vxlan100 master br100
 ip link set br100 master tenant1
 ip link set vxlan100 up
 ip link set br100 up
 ip link set dev br100 address 00:00:5e:00:01:01
-ip addr add 10.0.$dc.1/24 dev br100
+ip addr add 10.0.$dc.1/24 dev br100 
 bridge link set dev vxlan100 neigh_suppress on
-ip link set eth2 master br100
+ip link set eth2 master br100 
 ip link set eth2 up
 vtysh << EOF
 configure terminal
@@ -144,9 +144,6 @@ exit
 router bgp $asn vrf tenant1
  address-family ipv4 unicast
   redistribute connected
- exit-address-family
- address-family l2vpn evpn
-  advertise ipv4 unicast
  exit-address-family
 exit
 router ospf
@@ -192,6 +189,14 @@ ip link set vxlan999 master br999
 ip link set br999 master tenant1
 ip link set vxlan999 up
 ip link set br999 up
+ip link add vxlan100 type vxlan id 10${dc}00 local $lo_ip dstport 4789 nolearning
+ip link add br100 type bridge
+ip link set vxlan100 master br100
+ip link set br100 master tenant1
+ip link set vxlan100 up
+ip link set br100 up
+ip addr add 10.0.$dc.254/24 dev br100
+bridge link set dev vxlan100 neigh_suppress on
 vtysh << EOF
 configure terminal
 no ipv6 forwarding
@@ -219,16 +224,13 @@ router bgp $asn
  address-family l2vpn evpn
   neighbor $n1 activate
   neighbor $n2 activate
+  advertise-all-vni
  exit-address-family
 exit
 router bgp $asn vrf tenant1
  neighbor $dci_peer remote-as $asn_remote
  address-family ipv4 unicast
-  redistribute connected
   neighbor $dci_peer activate
- exit-address-family
- address-family l2vpn evpn
-  advertise ipv4 unicast
  exit-address-family
 exit
 EOF
